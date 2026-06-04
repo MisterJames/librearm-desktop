@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="LibreArm_Desktop.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:LibreArm_Desktop.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:ProfilePhotoSourceConverter x:Key="ProfilePhotoSourceConverter" />
+        <DataTemplate x:Key="QuickProfileTemplate">
+            <Grid Padding="8" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid Width="40" Height="40">
+                    <PersonPicture
+                        Width="40"
+                        Height="40"
+                        DisplayName="{Binding DisplayName}" />
+                    <Ellipse>
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding PhotoPath, Converter={StaticResource ProfilePhotoSourceConverter}}" Stretch="UniformToFill" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+                <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock FontSize="16" Text="{Binding DisplayName}" />
+                    <TextBlock FontSize="12" Text="{Binding DemographicsText}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <NavigationView
+        x:Name="RootNavigation"
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="False"
+        PaneDisplayMode="LeftCompact"
+        SelectionChanged="OnNavigationSelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:Name="ReadingsItem" Content="Readings" Icon="Home" IsSelected="True" Tag="readings" />
+            <NavigationViewItem x:Name="HistoryItem" Content="History" Icon="Library" Tag="history" />
+            <NavigationViewItem x:Name="DeviceItem" Content="Device" Icon="AllApps" Tag="device" />
+        </NavigationView.MenuItems>
+        <NavigationView.PaneFooter>
+            <Button
+                HorizontalAlignment="Stretch"
+                Click="OnQuickProfileClick"
+                ToolTipService.ToolTip="Switch profile">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Grid Width="32" Height="32">
+                        <PersonPicture
+                            Width="32"
+                            Height="32"
+                            DisplayName="{Binding ActiveProfile.DisplayName}" />
+                        <Ellipse>
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="{Binding ActiveProfile.PhotoPath, Converter={StaticResource ProfilePhotoSourceConverter}}" Stretch="UniformToFill" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ActiveProfileText}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Button>
+        </NavigationView.PaneFooter>
+
+        <ScrollViewer>
+            <Grid Padding="24" RowSpacing="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <InfoBar
+                    Grid.Row="0"
+                    IsOpen="True"
+                    Severity="Informational"
+                    Title="Local readings only"
+                    Message="LibreArm captures readings from your device and stores them locally. It is not medical advice or a diagnostic tool." />
+
+                <StackPanel x:Name="ReadingsScreen" Grid.Row="1" Spacing="20">
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="4" Tag="systolic" Tapped="OnMetricInfoTapped" ToolTipService.ToolTip="Pressure when your heart contracts. Tap for details.">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="Systolic" />
+                                    <FontIcon FontSize="14" Glyph="&#xE946;" />
+                                </StackPanel>
+                                <TextBlock FontSize="36" FontWeight="SemiBold" Text="{Binding LastSystolicText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="4" Tag="diastolic" Tapped="OnMetricInfoTapped" ToolTipService.ToolTip="Pressure while your heart rests between beats. Tap for details.">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="Diastolic" />
+                                    <FontIcon FontSize="14" Glyph="&#xE946;" />
+                                </StackPanel>
+                                <TextBlock FontSize="36" FontWeight="SemiBold" Text="{Binding LastDiastolicText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4" Tag="map" Tapped="OnMetricInfoTapped" ToolTipService.ToolTip="Mean arterial pressure, a calculated average pressure across a heartbeat. Tap for details.">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="MAP" />
+                                    <FontIcon FontSize="14" Glyph="&#xE946;" />
+                                </StackPanel>
+                                <TextBlock FontSize="36" FontWeight="SemiBold" Text="{Binding LastMeanArterialPressureText}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Spacing="4">
+                                <TextBlock Text="Pulse" />
+                                <TextBlock FontSize="36" FontWeight="SemiBold" Text="{Binding LastPulseText}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Spacing="12">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Control" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Grid Width="48" Height="48">
+                                    <PersonPicture
+                                        Width="48"
+                                        Height="48"
+                                        DisplayName="{Binding ActiveProfile.DisplayName}" />
+                                    <Ellipse>
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{Binding ActiveProfile.PhotoPath, Converter={StaticResource ProfilePhotoSourceConverter}}" Stretch="UniformToFill" />
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                </Grid>
+                                <StackPanel VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding ActiveProfile.DisplayName}" />
+                                    <TextBlock FontSize="12" Text="{Binding ProfileContextText}" TextWrapping="NoWrap" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Text="{Binding ConnectionText}" />
+                            <TextBlock Text="{Binding BatteryText}" />
+                            <TextBlock Text="{Binding StatusText}" TextWrapping="WrapWholeWords" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Click="OnStartSessionClick" Content="Start session" />
+                                <Button Command="{Binding StopCommand}" Content="Stop" />
+                                <Button Click="OnHideToTrayClick" Content="Hide to tray" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="BP status" />
+                            <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding LatestCategoryText}" />
+                            <TextBlock Text="{Binding LatestTargetText}" TextWrapping="WrapWholeWords" />
+                            <TextBlock Text="{Binding ProfileContextText}" TextWrapping="WrapWholeWords" />
+                            <TextBlock FontSize="12" Text="{Binding LatestDisclaimerText}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+
+                        <Grid Grid.Column="1" RowSpacing="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="220" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="160" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Weekly trends" />
+
+                            <Border Grid.Row="1" Padding="12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                                <Canvas x:Name="BloodPressureTrendCanvas" Background="Transparent" SizeChanged="OnTrendCanvasSizeChanged" />
+                            </Border>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Rectangle Width="16" Height="4" Fill="#4CC2FF" />
+                                    <TextBlock Text="Systolic" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Rectangle Width="16" Height="4" Fill="#FF8A65" />
+                                    <TextBlock Text="Diastolic" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Rectangle Width="16" Height="4" Fill="#BA68C8" />
+                                    <TextBlock Text="MAP" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Border Grid.Row="3" Padding="12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                                <Canvas x:Name="PulseTrendCanvas" Background="Transparent" SizeChanged="OnTrendCanvasSizeChanged" />
+                            </Border>
+
+                            <StackPanel Grid.Row="4" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Rectangle Width="16" Height="4" Fill="#81C784" />
+                                    <TextBlock Text="Pulse" />
+                                </StackPanel>
+                                <TextBlock FontSize="12" Text="Weekly profile averages. BP reference lines show 120 systolic and 80 diastolic for adult context." TextWrapping="WrapWholeWords" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding LastMeasuredAtText}" />
+                        <TextBlock Text="{Binding LastStatusText}" TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel x:Name="HistoryScreen" Grid.Row="1" Spacing="12" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Session history" />
+                            <Button Grid.Column="1" Margin="0,0,8,0" Command="{Binding ExportCommand}" Content="Export CSV" />
+                            <Button Grid.Column="2" Command="{Binding ClearHistoryCommand}" Content="Clear all" />
+                        </Grid>
+
+                        <ListView MinHeight="360" ItemsSource="{Binding History}">
+                            <ListView.Header>
+                                <Grid Padding="8,0,8,8" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150" />
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontWeight="SemiBold" Text="Completed" />
+                                    <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="Average" />
+                                    <TextBlock Grid.Column="2" FontWeight="SemiBold" Text="MAP" />
+                                    <TextBlock Grid.Column="3" FontWeight="SemiBold" Text="Pulse" />
+                                    <TextBlock Grid.Column="4" FontWeight="SemiBold" Text="Unit" />
+                                    <TextBlock Grid.Column="5" FontWeight="SemiBold" Text="Reading 1" />
+                                    <TextBlock Grid.Column="6" FontWeight="SemiBold" Text="Reading 2" />
+                                    <TextBlock Grid.Column="7" FontWeight="SemiBold" Text="Status" />
+                                </Grid>
+                            </ListView.Header>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="8" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="90" />
+                                            <ColumnDefinition Width="90" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding CompletedAtText}" />
+                                        <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding AverageText}" />
+                                        <TextBlock Grid.Column="2" Text="{Binding MeanArterialPressureText}" />
+                                        <TextBlock Grid.Column="3" Text="{Binding PulseText}" />
+                                        <TextBlock Grid.Column="4" Text="{Binding UnitText}" />
+                                        <TextBlock Grid.Column="5" Text="{Binding FirstReadingText}" />
+                                        <TextBlock Grid.Column="6" Text="{Binding SecondReadingText}" />
+                                        <TextBlock Grid.Column="7" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                </StackPanel>
+
+                <StackPanel x:Name="DeviceScreen" Grid.Row="1" Spacing="16" Visibility="Collapsed">
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="12">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Device setup" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Command="{Binding ScanCommand}" Content="Scan" />
+                                <Button Command="{Binding StopScanCommand}" Content="Stop scan" />
+                                <Button Command="{Binding ConnectCommand}" Content="Connect" />
+                                <Button Command="{Binding DisconnectCommand}" Content="Disconnect" />
+                            </StackPanel>
+                            <ToggleSwitch Header="View all devices" IsOn="{Binding ShowAllDevices, Mode=TwoWay}" />
+
+                            <ListView
+                                MinHeight="440"
+                                ItemsSource="{Binding Devices}"
+                                SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                                SelectionMode="Single">
+                                <ListView.Header>
+                                    <Grid Padding="8,0,8,8" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="90" />
+                                            <ColumnDefinition Width="120" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock FontWeight="SemiBold" Text="Name" />
+                                        <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="Service" />
+                                        <TextBlock Grid.Column="2" FontWeight="SemiBold" Text="Signal" />
+                                        <TextBlock Grid.Column="3" FontWeight="SemiBold" Text="Address" />
+                                    </Grid>
+                                </ListView.Header>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="8" ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ServiceText}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="2" Text="{Binding RssiText}" />
+                                            <TextBlock Grid.Column="3" Text="{Binding BluetoothAddressText}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="12">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Status" />
+                            <TextBlock Text="{Binding ActiveProfileText}" />
+                            <TextBlock Text="{Binding ConnectionText}" />
+                            <TextBlock Text="{Binding BatteryText}" />
+                            <TextBlock Text="{Binding StatusText}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel x:Name="ProfilesScreen" Grid.Row="1" Spacing="16" Visibility="Collapsed">
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="12">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Profiles" />
+                            <ListView
+                                MinHeight="360"
+                                ItemsSource="{Binding Profiles}"
+                                SelectedItem="{Binding SelectedProfile, Mode=TwoWay}"
+                                SelectionMode="Single">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="8" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="32" Height="32">
+                                            <PersonPicture
+                                                Width="32"
+                                                Height="32"
+                                                DisplayName="{Binding DisplayName}" />
+                                            <Ellipse>
+                                                <Ellipse.Fill>
+                                                    <ImageBrush ImageSource="{Binding PhotoPath, Converter={StaticResource ProfilePhotoSourceConverter}}" Stretch="UniformToFill" />
+                                                </Ellipse.Fill>
+                                            </Ellipse>
+                                        </Grid>
+                                            <StackPanel Grid.Column="1" Spacing="2">
+                                                <TextBlock FontSize="16" Text="{Binding DisplayName}" />
+                                                <TextBlock FontSize="12" Text="{Binding DemographicsText}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="8">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Manage" />
+                            <TextBlock Text="{Binding ActiveProfileText}" TextWrapping="WrapWholeWords" />
+                            <Button Click="OnSwitchProfileClick" Content="Switch to selected" />
+                            <Button Click="OnAddProfileClick" Content="Create profile" />
+                            <Button Click="OnRenameProfileClick" Content="Edit selected" />
+                            <Button Click="OnSetProfilePhotoClick" Content="Set photo" />
+                            <Button Click="OnRemoveProfilePhotoClick" Content="Remove photo" />
+                            <Button Click="OnDeleteProfileClick" Content="Delete selected" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </NavigationView>
+</Page>

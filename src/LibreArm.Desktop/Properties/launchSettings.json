@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LibreArm.Desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LibreArm.Desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

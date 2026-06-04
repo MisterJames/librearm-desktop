@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LibreArm.Core/LibreArm.Core.csproj" />
+    <Project Path="src/LibreArm.Desktop/LibreArm.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LibreArm.Core.Tests/LibreArm.Core.Tests.csproj" />
+  </Folder>
+</Solution>
