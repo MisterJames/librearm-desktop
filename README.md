@@ -58,6 +58,23 @@ To explicitly build the desktop app for x64:
 dotnet build src\LibreArm.Desktop\LibreArm.Desktop.csproj -p:Platform=x64
 ```
 
+## Release Build
+
+Release artifacts are built as unsigned MSIX sideload package zips under `artifacts/release`.
+
+```powershell
+.\scripts\build-release.ps1 -Version 0.1.0-beta.1 -RuntimeIdentifier win-x64
+```
+
+To publish downloadable builds from GitHub, push a version tag:
+
+```powershell
+git tag v0.1.0-beta.1
+git push origin v0.1.0-beta.1
+```
+
+The `Release` workflow builds `win-x64`, `win-arm64`, and `win-x86` package zips, uploads them as workflow artifacts, and attaches them to the tag's GitHub Release. These are unsigned sideload packages, so Windows Developer Mode is required.
+
 ## Run
 
 From the repository root:
