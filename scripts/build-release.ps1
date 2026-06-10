@@ -7,6 +7,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    $PSNativeCommandUseErrorActionPreference = $true
+}
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $desktopProject = Join-Path $repoRoot "src\LibreArm.Desktop\LibreArm.Desktop.csproj"
@@ -104,6 +107,7 @@ try {
             /p:Configuration=$Configuration `
             /p:Platform=$platform `
             /p:RuntimeIdentifier=$runtime `
+            /p:SelfContained=true `
             /p:GenerateAppxPackageOnBuild=true `
             /p:AppxBundle=Never `
             /p:UapAppxPackageBuildMode=SideloadOnly `
